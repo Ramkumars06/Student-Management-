@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Student Marks</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f1f5f9;
+        }
+
+        /* Sidebar */
+        .side {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 220px;
+            height: 100vh;
+            background-color: #0f172a;
+            padding: 20px;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .side h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .side button {
+            width: 100%;
+            padding: 10px;
+            background-color: #1e293b;
+            border: none;
+            border-radius: 6px;
+            color: white;
+            cursor: pointer;
+        }
+
+        .side button:hover {
+            background-color: #2563eb;
+        }
+
+        /* Main content alignment FIX */
+        .main {
+            margin-left: 220px; /* sidebar width */
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 40px;
+        }
+
+        .titl {
+            margin-bottom: 20px;
+            color: #012058;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            width: 350px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .card input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            border: 1px solid #89a0eb;
+        }
+
+        .add-btn {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            background-color: #2563eb;
+            color: white;
+        }
+
+        .add-btn:hover {
+            background-color: #0b42a8;
+        }
+
+        /* Popup */
+        .popup {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        .popup-content {
+            background: white;
+            width: 400px;
+            margin: auto;
+            margin-top: 20%;
+            padding: 20px;
+            border-radius: 10px;
+            position: relative;
+        }
+
+        .close {
+            position: absolute;
+            right: 15px;
+            top: 10px;
+            cursor: pointer;
+            font-size: 18px;
+            color: red;
+        }
+
+        pre {
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="side">
+        <h2>Menu</h2>
+        <button onclick="showAdd()">Add Student</button>
+        <button onclick="total()">Total</button>
+        <button onclick="average()">Average</button>
+        <button onclick="getgrade(avg)">Grade</button>
+        <button onclick="view()">View</button>
+    </div>
+
+    <div class="main">
+        <h1 class="titl">Student Mark Management</h1>
+
+        <div id="addBox" class="card">
+            <input id="name" placeholder="Student Name">
+            <input id="m1" placeholder="Mark 1">
+            <input id="m2" placeholder="Mark 2">
+            <input id="m3" placeholder="Mark 3">
+            <input id="m4" placeholder="Mark 4">
+            <input id="m5" placeholder="Mark 5">
+            <button class="add-btn" onclick="addStudent()">Add Student</button>
+        </div>
+    </div>
+
+    <div id="popup" class="popup">
+        <div class="popup-content">
+            <span class="close" onclick="closePopup()">✖</span>
+            <pre id="output"></pre>
+        </div>
+    </div>
+
+    <script>
+        let students = [];
+        let avg = 0;
+
+        function showPopup(text) {
+            document.getElementById("output").innerText = text;
+            document.getElementById("popup").style.display = "block";
+        }
+
+        function closePopup() {
+            document.getElementById("popup").style.display = "none";
+        }
+
+        function showAdd() {
+            document.getElementById("addBox").style.display = "block";
+        }
+
+        function addStudent() {
+            let name = document.getElementById("name").value.trim();
+            let marks = [
+                Number(m1.value),
+                Number(m2.value),
+                Number(m3.value),
+                Number(m4.value),
+                Number(m5.value)
+            ];
+
+            if (!name || marks.some(m => isNaN(m))) {
+                showPopup("Enter every field");
+                return;
+            }
+
+            if (marks.some(m => m < 0 || m > 100)) {
+                showPopup("Invalid marks entered");
+                return;
+            }
+
+            students.push({ name, marks });
+            showPopup("Student added successfully");
+        }
+
+        function total() {
+            if (!students.length) {
+                showPopup("No students were added");
+                return;
+            }
+
+            let total = students.reduce(
+                (s, st) => s + st.marks.reduce((a, b) => a + b, 0),
+                0
+            );
+
+            showPopup("Total Marks: " + total);
+        }
+
+        function average() {
+            if (!students.length) {
+                showPopup("No students were added");
+                return;
+            }
+
+            let total = students.reduce(
+                (s, st) => s + st.marks.reduce((a, b) => a + b, 0),
+                0
+            );
+
+            avg = total / (students.length * 5);
+            showPopup("Average Marks: " + avg.toFixed(2));
+        }
+
+        function getgrade(avg) {
+            if (!students.length || avg === 0) {
+                showPopup("Calculate average first");
+                return;
+            }
+
+            let grade =
+                avg > 90 ? "A" :
+                avg >= 80 ? "B" :
+                avg >= 70 ? "C" :
+                avg >= 60 ? "D" : "Fail";
+
+            showPopup("Grade: " + grade);
+        }
+
+        function view() {
+            if (!students.length) {
+                showPopup("No students were added");
+                return;
+            }
+
+            let text = students.map((s, i) => {
+                let total = s.marks.reduce((a, b) => a + b, 0);
+                let avg = total / s.marks.length;
+
+                return `Student ${i + 1}
+Name: ${s.name}
+Total: ${total}
+Average: ${avg.toFixed(2)}`;
+            }).join("\n\n");
+
+            showPopup(text);
+        }
+    </script>
+
+</body>
+</html>
